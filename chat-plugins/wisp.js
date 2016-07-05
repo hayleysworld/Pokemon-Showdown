@@ -604,6 +604,8 @@ exports.commands = {
 	},
 	unlinkhelp: ["/unlink [user] - Breaks a user's posted links."],
 
+	clearmessages: 'hidetext',
+	clearmsg: 'hidetext',
 	hidetext: function (target, room, user) {
 		if (!target) return this.parse('/help hidetext');
 		this.splitTarget(target);
@@ -616,12 +618,10 @@ exports.commands = {
 			this.errorReply("/hidetext - Access denied.");
 			return false;
 		}
-		if (targetUser.locked || Punishments.useridSearch(userid)) {
+		if ((targetUser.locked || Punishments.useridSearch(userid)) && user.can('lock', targetUser)) {
 			hidetype = 'hide|';
-		} else if ((room.bannedUsers[toId(name)] && room.bannedIps[targetUser.latestIp]) || user.can('rangeban')) {
-			hidetype = 'roomhide|';
 		} else {
-			return this.errorReply("User '" + name + "' is not banned from this room or locked.");
+			hidetype = 'roomhide|';
 		}
 		this.addModCommand("" + targetUser.name + "'s messages were cleared from room " + room.id + " by " + user.name + ".");
 		this.add('|unlink|' + hidetype + userid);

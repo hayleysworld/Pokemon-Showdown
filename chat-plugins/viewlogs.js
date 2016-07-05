@@ -168,6 +168,7 @@ function permissionCheck(user, room) {
 	if (Rooms(room) && Rooms(room).isPersonal && (!user.can('seniorstaff') && !user.can('warn', null, Rooms(room)))) {
 		return false;
 	}
+	if (toId(room) === 'upperstaff' && !user.can('seniorstaff')) return false;
 	return true;
 }
 

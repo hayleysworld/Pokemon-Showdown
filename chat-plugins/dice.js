@@ -49,7 +49,7 @@ class Dice {
 			if (this.players.includes(user)) return self.sendReply('You have already joined this game of dice.');
 			if (this.players.length && this.players[0].latestIp === user.latestIp) return self.errorReply("You have already joined this game of dice under the alt '" + this.players[0].name + "'.");
 			if (this.players.length >= 2) return self.errorReply("Two users have already joined this game of dice.");
-	
+
 			this.players.push(user);
 			this.room.add('|uhtmlchange|' + this.room.diceCount + '|' + this.startMessage + '<center>' + Wisp.nameColor(user.name) + ' has joined the game!</center></div>').update();
 			if (this.players.length === 2) this.play();
@@ -86,7 +86,7 @@ class Dice {
 				if (roll2 > roll1) this.players.reverse();
 				let winner = this.players[0], loser = this.players[1];
 
-				
+
 				let taxedAmt = Math.round(this.bet * TAX);
 				setTimeout(() => {
 					let buck = (this.bet === 1 ? 'buck' : 'bucks');

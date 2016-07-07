@@ -95,23 +95,27 @@ class Ambush {
 		if (!this.players.has(targetUser)) return self.sendReply(targetUser.name + ' is not a player!');
 		if (this.players.get(targetUser).status === 'dead') return self.sendReply(targetUser.name + ' has already been shot!');
 
-		this.players.get(user).rounds--;
 		this.madeMove = true;
+		this.players.get(user).rounds--;
 		if (targetUser === user) {
 			this.room.add('|html|<b>' + user.name + ' shot themself!</b>');
-		} else if (!this.players.get(targetUser).rounds) {
+		} else if (this.players.get(targetUser).shield) {
 			this.room.add('|html|<b>' + Tools.escapeHTML(user.name) + ' fired at ' + Tools.escapeHTML(targetUser.name) + ', but ' + Tools.escapeHTML(targetUser.name) + ' has an active shield!</b>');
 			return;
 		} else {
 			this.room.add('|html|<b>' + Tools.escapeHTML(user.name) + ' fired at ' + Tools.escapeHTML(targetUser.name) + '!</b>');
 		}
 		this.players.get(targetUser).status = 'dead';
+		this.players.get(user).shield = true;
 
 		if (this.checkWinner()) this.getWinner();
 	}
 	loadGuns() {
 		this.players.forEach((details, user) => {
-			if (this.players.get(user).status === 'alive') this.players.get(user).rounds = 1;
+			if (this.players.get(user).status === 'alive') {
+				this.players.get(user).rounds = 1;
+				this.players.get(user).shield = false;
+			}
 		});
 	}
 	resetTimer() {

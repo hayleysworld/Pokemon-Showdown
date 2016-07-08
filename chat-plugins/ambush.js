@@ -40,7 +40,7 @@ class Ambush {
 		if (this.players.has(user)) return self.sendReply('You have already joined this game of ambush.');
 		if (this.round > 0) return self.sendReply('You cannot join a game of ambush after it has started.');
 
-		this.players.set(user, {status:'alive', rounds:0});
+		this.players.set(user, {status:'alive', rounds:0, warnings:0});
 		this.updateJoins();
 	}
 	leave(user, self) {
@@ -56,6 +56,12 @@ class Ambush {
 	getSurvivors() {
 		return Array.from(this.players).filter(player => player[1].status === 'alive');
 	}
+	getMsg() {
+		let msg = 'ambush' + this.room.ambushCount + this.round + '|<div class = "infobox"><center><b>Round ' + this.round + '</b><br>' +
+			'Players: ' + this.getSurvivors().map(player => Tools.escapeHTML(player[0].name)).join(', ') +
+			'<br><small>Use /fire [player] to shoot another player!</small>';
+		return msg;
+	}
 	nextRound() {
 		clearTimeout(this.timer);
 		this.canShoot = false;
@@ -68,10 +74,9 @@ class Ambush {
 		this.lastRoundSurvivors = survivors.length;
 
 		this.round++;
+		this.madeMove = false;
 		this.loadGuns();
-		let msg = 'ambush' + this.room.ambushCount + this.round + '|<div class = "infobox"><center><b>Round ' + this.round + '</b><br>' +
-			'Players: ' + survivors.map(player => Tools.escapeHTML(player[0].name)).join(', ') +
-			'<br><small>Use /fire [player] to shoot another player!</small>';
+		let msg = this.getMsg();
 		this.room.add('|uhtml|' + msg + '<br><i>Wait for it...</i></div>').update();
 
 		this.release = setTimeout(() => {
@@ -83,9 +88,7 @@ class Ambush {
 	fire(user, target, self) {
 		let getUser = this.players.get(user);
 		if (!getUser) return self.sendReply("You aren't a player in this game of Ambush.");
-		this.madeMove = false;
-
-		if (!this.canShoot) return self.sendReply("You're not allowed to open fire yet!");
+		if (!this.round) return self.sendReply("You're not allowed to open fire yet!");
 
 		if (getUser.status === 'dead') return self.sendReply("You can't fire after you've been killed!");
 		if (!getUser.rounds) return self.sendReply("You're out of rounds! You can't shoot anyone else!");
@@ -94,6 +97,17 @@ class Ambush {
 		if (!targetUser) return self.sendReply('User ' + target + ' not found.');
 		if (!this.players.has(targetUser)) return self.sendReply(targetUser.name + ' is not a player!');
 		if (this.players.get(targetUser).status === 'dead') return self.sendReply(targetUser.name + ' has already been shot!');
+		if (!this.canShoot) {
+			if (targetUser === user) return self.sendReply("You're not allowed to open fire yet!");
+			if (getUser.warnings < 2) {
+				this.players.get(user).warnings++;
+				return self.sendReply("You're not allowed to open fire yet!");
+			}
+			this.removeUser(user);
+			self.sendReply("You have been disqualified for spamming /fire.");
+			self.privateModCommand("(" + user.name + " was disqualified for spamming /fire.)");
+			return;
+		}
 
 		this.madeMove = true;
 		this.players.get(user).rounds--;
@@ -112,9 +126,11 @@ class Ambush {
 	}
 	loadGuns() {
 		this.players.forEach((details, user) => {
-			if (this.players.get(user).status === 'alive') {
-				this.players.get(user).rounds = 1;
-				this.players.get(user).shield = false;
+			let getUser = this.players.get(user);
+			if (getUser.status === 'alive') {
+				getUser.rounds = 1;
+				getUser.shield = false;
+				getUser.warnings = 0;
 			}
 		});
 	}
@@ -124,7 +140,7 @@ class Ambush {
 			this.room.update();
 		}, ROUND_DURATION);
 	}
-	dq(target, self) {
+	dq(user, target, self) {
 		if (!this.round) return self.sendReply('You can only disqualify a player after the first round has begun.');
 		let targetUser = Users(target);
 		if (!targetUser) return self.sendReply('User ' + target + ' not found.');
@@ -133,9 +149,21 @@ class Ambush {
 		if (!getUser) return self.sendReply(targetUser.name + ' is not a player!');
 		if (getUser.status === 'dead') return self.sendReply(targetUser.name + ' has already been killed!');
 
-		this.players.delete(targetUser);
-		this.room.add('|html|<b>' + Tools.escapeHTML(targetUser.name) + ' has been disqualified from the game.</b>');
+		this.removeUser(targetUser);
+		self.privateModCommand("(" + targetUser.name + " was disqualified by " + user.name + ".)");
 		if (this.checkWinner()) this.getWinner();
+	}
+	removeUser(user) {
+		if (!this.players.has(user)) return;
+
+		this.players.delete(user);
+		this.room.add('|html|<b>' + Tools.escapeHTML(user.name) + ' has been disqualified from the game.</b>');
+		this.madeMove = true;
+		if (this.checkWinner()) {
+			this.getWinner();
+		} else if (!this.canShoot) {
+			this.room.add('|uhtmlchange|' + this.getMsg() + '<br><i>Wait for it...</i></div>').update();
+		}
 	}
 	checkWinner() {
 		if (this.getSurvivors().length === 1) return true;
@@ -167,10 +195,13 @@ class Ambush {
 }
 
 let commands = {
-	'': 'new',
-	'start': 'new',
-	'begin': 'new',
-	'new': function (target, room, user) {
+	'': 'help',
+	help: function () {
+		this.parse('/help ambush');
+	},
+	'new': 'start',
+	begin: 'start',
+	start: function (target, room, user) {
 		if (room.ambush) return this.sendReply("There is already a game of ambush going on in this room.");
 		if (room.isMuted(user) || user.locked) return this.errorReply("You cannot use this while unable to speak.");
 		if (!user.can('broadcast', null, room)) return this.sendReply("You must be ranked + or higher in this room to start a game of ambush.");
@@ -208,7 +239,7 @@ let commands = {
 		if (room.isMuted(user) || user.locked) return this.errorReply("You cannot use this while unable to speak.");
 		if (!user.can('mute', null, room)) return this.sendReply("You must be ranked % or higher in this room to disqualify a user from a game of ambush.");
 
-		room.ambush.dq(target, this);
+		room.ambush.dq(user, target, this);
 	},
 	shoot: 'fire',
 	fire: function (target, room, user) {
@@ -224,8 +255,17 @@ let commands = {
 
 		room.ambush.end(user);
 	},
-	help: function () {
-		this.parse('/help ambush');
+	rule: 'rules',
+	rules: function (target, room, user) {
+		if (!this.runBroadcast()) return;
+		this.sendReplyBox("Ambush is a game of dexterity, and the goal is to be the last one standing." +
+			"Players 'shoot' each other by using /fire [player] once the big red '<b style = \"color: red\">FIRE!</b>' message pops up on screen." +
+			"If you have shot someone in a round, then you are given a 'shield' for the rest of the round, and will be immune to any bullets till the next round starts," +
+			"but they cannot fire anymore for that round. This means that players have to strive to be the fastest shooter so that they are guaranteed safety." +
+			"Once signups end and the game begins, there is NO talking in order to not break other players' concentration." +
+			"Spamming /fire before the message to fire pops up will get you disqualified automatically after three attempts.<br>" +
+			"If you'd like to view the commands for Ambush, simply use /ambush help. Have fun playing!"
+		);
 	},
 };
 
@@ -238,7 +278,7 @@ exports.commands = {
 		'/ambush join/leave - Joins/Leaves a game of ambush.',
 		'/ambush proceed - Forcibly starts the first round of the game. Requires + or higher to use',
 		'/ambush dq [user] - Disqualifies a player from a game of ambush. Requires % or higher to use',
-		'/ambush shoot/fire [user] - Shoots another player (you can shoot yourself too)',
+		'/ambush shoot/fire [user] - Shoots another player (you can shoot yourself too). NOTE: Spamming this can get you disqualified.',
 		'/ambush end - Forcibly ends a game of ambush. Requires % or higher to use.',
 		'/ambush rules - Displays the rules of the game.',
 	],

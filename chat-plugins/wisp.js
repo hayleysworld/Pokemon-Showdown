@@ -1247,6 +1247,10 @@ Object.assign(Wisp, {
 		message = Autolinker.link(message, {stripPrefix: false, phone: false, twitter: false});
 		return message;
 	},
+
+	randomString: function (length) {
+		return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+	},
 });
 
 function queueAdvertisement(message, user, ip) {

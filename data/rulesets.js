@@ -630,6 +630,37 @@ exports.BattleFormats = {
 			}
 		},
 	},
+	duotypeclause: {
+		effectType: 'Rule',
+		onStart: function () {
+			this.add('rule', 'Duo Type Clause: Pokémon in a team must share two types');
+		},
+		validateTeam: function (team, format, teamHas) {
+			if (!team[0]) return;
+			if (team.length < 6) return ["Your team must have 6 Pokémon"];
+			let typeCount = {"Bug":0, "Dark":0, "Dragon":0, "Electric":0, "Fairy":0, "Fighting":0, "Fire":0, "Flying":0, "Ghost":0, "Grass":0, "Ground":0, "Ice":0, "Normal":0, "Poison":0, "Psychic":0, "Rock":0, "Steel":0, "Water":0};
+
+			for (let i in team) {
+				let pokemon = this.getTemplate(team[i].species);
+				let types = pokemon.types;
+				for (let type in types) typeCount[types[type]]++;
+			}
+
+			let isDualType = false;
+			for (let type1 in typeCount) {
+				let count1 = typeCount[type1];
+				for (let type2 in typeCount) {
+					if (type1 === type2) continue;
+					let count2 = typeCount[type2];
+					if ((count1 + count2) === 6) {
+						isDualType = true;
+						break;
+					}
+				}
+			}
+			if (!isDualType) return ["Your team must share two types."];
+		},
+	},
 	megarayquazaclause: {
 		effectType: 'Rule',
 		onStart: function () {

@@ -466,6 +466,14 @@ exports.Formats = [
 		banlist: ['Groudon-Primal', 'Kyogre-Primal', 'Arena Trap', 'Huge Power', 'Moody', 'Parental Bond', 'Protean', 'Pure Power', 'Shadow Tag', 'Wonder Guard', 'Assist', 'Chatter'],
 	},
 	{
+		name: "C&E",
+		section: "Other Metagames",
+
+		searchShow: false,
+		maxLevel: 100,
+		ruleset: ['Team Preview'],
+	},
+	{
 		name: "1v1",
 		desc: [
 			"Bring three Pok&eacute;mon to Team Preview and choose one to battle.",

@@ -865,7 +865,7 @@ exports.commands = {
 	},
 
 	crashlogs: function (target, room, user) {
-		if (!this.can('hotpatch')) return false;
+		if (!this.can('hotpatch') && user.userid !== 'panpawn' && user.userid !== 'silveee') return false;
 		if (target) {
 			target = Number(target);
 			if (isNaN(target)) return this.parse('/help crashlogs');

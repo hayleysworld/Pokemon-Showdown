@@ -200,7 +200,7 @@ class Blackjack {
 		output += "<br />Score: " + this.players[this.curUser].points;
 		output += '<br /><button name="send" value="/blackjack hit">Hit</button> <button name="send" value="/blackjack stand">Stand</button>';
 
-		this.players[this.curUser].user.sendTo(this.room.id, "|c|~Blackjack|" + this.players[this.curUser].user.name + ", it's your turn to move.");
+		this.players[this.curUser].user.sendTo(this.room.id, "|c|~|" + this.players[this.curUser].user.name + ", it's your turn to move.");
 		this.players[this.curUser].user.sendTo(this.room.id, '|uhtmlchange|user-bj-' + this.id + '|');
 		this.players[this.curUser].user.sendTo(this.room.id, output);
 		this.timer = setTimeout(() => {

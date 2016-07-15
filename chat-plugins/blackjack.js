@@ -191,7 +191,7 @@ class Blackjack {
 		for (let u in this.players[this.curUser].cards) {
 			let card = this.players[this.curUser].cards[u];
 			output += '<img src="http://' + IP + ':' + Config.port + '/cards/' + toId(card).toUpperCase() + symbols[card.substr(-1)] + '.png"';
-			output += ' title="' + card + '" height="150">';
+			output += ' title="' + card + '" height="100">';
 		}
 		output += "<br />Score: " + this.players[this.curUser].points;
 		output += '<br /><button name="send" value="/blackjack hit">Hit</button> <button name="send" value="/blackjack stand">Stand</button>';

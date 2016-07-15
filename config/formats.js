@@ -510,7 +510,7 @@ exports.Formats = [
 	},
 	{
 		name: "Duotype",
-		section: "Monotype",
+		section: "Other Metagames",
 		column: 2,
 
 		ruleset: ['Pokemon', 'Standard', 'Baton Pass Clause', 'Swagger Clause', 'Duo Type Clause', 'Team Preview'],

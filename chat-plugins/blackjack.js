@@ -229,6 +229,7 @@ class Blackjack {
 }
 
 exports.commands = {
+	bj: 'blackjack',
 	blackjack: {
 		new: 'create',
 		create: function (target, room, user) {

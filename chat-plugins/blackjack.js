@@ -94,6 +94,10 @@ class Blackjack {
 			}
 		}
 
+		if (this.autostart) {
+			clearTimeout(this.autostart);
+			delete this.autostart;
+		}
 		delete Rooms(this.room.id).blackjack;
 	}
 	giveCredits(winners) {

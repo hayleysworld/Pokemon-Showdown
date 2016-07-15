@@ -42,9 +42,12 @@ class Blackjack {
 		this.started = true;
 		for (let player in this.players) {
 			this.giveCard(this.players[player].user.userid);
-			output += Wisp.nameColor(this.players[player].user.userid, true) + ': [' + this.players[player].cards[0] + ']<br />';
+			this.giveCard(this.players[player].user.userid);
+			output += Wisp.nameColor(this.players[player].user.userid, true) + ': [' + this.players[player].cards[0] + '] ' +
+			'[' + this.players[player].cards[1] + '] (' + this.players[player].points + ')<br />';
 		}
 
+		this.giveCard('dealer');
 		this.giveCard('dealer');
 		output += "<b>Dealer:</b> [" + this.dealer.cards[0] + "]";
 
@@ -75,9 +78,9 @@ class Blackjack {
 			for (let u in winners) prettyWinners.push(Wisp.nameColor(winners[u], true));
 
 			if (winners.length < 1) {
-				this.add("<br />There's no winners this time.");
+				this.add("<br />There's no winners this time.", false, true);
 			} else {
-				this.add("<br />Winners: " + prettyWinners.join(', '));
+				this.add("<br />Winners: " + prettyWinners.join(', '), false, true);
 				if (this.room.id === 'marketplace') {
 					if (winners.length < 2) {
 						this.add("<br />Awarding 5 credits to " + winners[0] + ".", false, true);
@@ -135,8 +138,8 @@ class Blackjack {
 			}
 		}
 		player.points += points;
-		if (player.cards.length < 2) return;
-		if (player.cards.length > 1) this.add('<br />' + (user === 'dealer' ? 'The Dealer' : Wisp.nameColor(user, true)) + ' hit and received [' + player.cards[player.cards.length - 1] + ']');
+		if (player.cards.length < 3) return;
+		if (player.cards.length > 2) this.add('<br />' + (user === 'dealer' ? 'The <b>Dealer</b>' : Wisp.nameColor(user, true)) + ' hit and received [' + player.cards[player.cards.length - 1] + ']');
 		if (user === 'dealer') {
 			if (player.points > 21) {
 				let cards = '';
@@ -243,7 +246,7 @@ exports.commands = {
 			room.blackjack.add(
 				Wisp.nameColor(user.userid, true) + ' has started a game of blackjack.<br />' +
 				'<button name="send" value="/blackjack join">Join</button>' +
-				(room.blackjack.autostart ? '<br />Game will automatically start in ' + target + ' ' + (target === 1 ? 'minute' : 'minutes') + '.' : '')
+				(room.blackjack.autostart ? '<br />Game will automatically start in ' + target + ' ' + (target === 1 ? 'minute' : 'minutes') + '.' : ''), false, true
 			);
 		},
 
@@ -262,7 +265,8 @@ exports.commands = {
 
 		hit: function (target, room, user) {
 			if (!room.blackjack) return this.errorReply("There's no game of blackjack in this room.");
-			if (Users(room.blackjack.curUser).userid !== user.userid) return this.errorReply("It's not your turn to move.");
+			if (!room.blackjack.started) return this.errorReply("This game hasn't started yet.");
+			if (Users(room.blackjack.curUser) && Users(room.blackjack.curUser).userid !== user.userid) return this.errorReply("It's not your turn to move.");
 			clearTimeout(room.blackjack.timer);
 			delete room.blackjack.timer;
 			room.blackjack.giveCard(user.userid);
@@ -270,7 +274,8 @@ exports.commands = {
 
 		stand: function (target, room, user) {
 			if (!room.blackjack) return this.errorReply("There's no game of blackjack in this room.");
-			if (Users(room.blackjack.curUser).userid !== user.userid) return this.errorReply("It's not your turn to move.");
+			if (!room.blackjack.started) return this.errorReply("This game hasn't started yet.");
+			if (Users(room.blackjack.curUser) && Users(room.blackjack.curUser).userid !== user.userid) return this.errorReply("It's not your turn to move.");
 			clearTimeout(room.blackjack.timer);
 			delete room.blackjack.timer;
 			let cards = "";
@@ -283,6 +288,7 @@ exports.commands = {
 		j: 'join',
 		join: function (target, room, user) {
 			if (!room.blackjack) return this.errorReply("There's no game of blackjack in this room.");
+			if (room.blackjack.started) return this.errorReply("This game of blackjack has already started.");
 			if (!this.canTalk()) return this.errorReply("You can't join blackjack while unable to talk.");
 			let reply = room.blackjack.join(user);
 			if (reply) this.sendReply(reply);

@@ -9,7 +9,7 @@ const symbols = {
 	'♠': 'C',
 };
 
-let deck = ['A♥', 'A♦', 'A♣', 'A♠', '2♥', '2♦', '2♣', '2♠', '3♥', '3♦', '3♣',
+const deck = ['A♥', 'A♦', 'A♣', 'A♠', '2♥', '2♦', '2♣', '2♠', '3♥', '3♦', '3♣',
 '3♠', '4♥', '4♦', '4♣', '4♠', '5♥', '5♦', '5♣', '5♠', '6♥', '6♦', '6♣', '6♠',
 '7♥', '7♦', '7♣', '7♠', '8♥', '8♦', '8♣', '8♠', '9♥', '9♦', '9♣', '9♠', '10♥',
 '10♦', '10♣', '10♠', 'J♥', 'J♦', 'J♣', 'J♠', 'Q♥', 'Q♦', 'Q♣', 'Q♠', 'K♥', 'K♦',
@@ -21,7 +21,7 @@ class Blackjack {
 		this.players = {};
 		this.ips = [];
 		this.dealer = {cards: [], points: 0};
-		this.deck = Tools.shuffle(deck);
+		this.deck = Tools.shuffle(deck.slice(0));
 		this.id = Math.floor(Math.random() * 100000000);
 		this.lastMessage = "";
 		this.curUser = "";
@@ -116,7 +116,7 @@ class Blackjack {
 		this.lastMessage = this.lastMessage + message;
 	}
 	giveCard(user) {
-		if (this.deck.length < 1) this.deck = Tools.shuffle(deck);
+		if (this.deck.length < 1) this.deck = Tools.shuffle(deck.slice(0));
 		let card = toId(this.deck[0]).toUpperCase();
 		let player = (user === 'dealer' ? this.dealer : this.players[user]);
 		player.cards.push(this.deck[0]);
@@ -185,6 +185,7 @@ class Blackjack {
 			}
 			return;
 		}
+		this.players[this.curUser].user.sendTo(this.room.id, '|uhtmlchange|user-bj-' + this.id + '|');
 		if (this.players[this.curUser].status !== 'playing') {
 			let number = 0;
 			while (this.players[Object.keys(this.players)[number]].status !== 'playing') number++;
@@ -201,7 +202,6 @@ class Blackjack {
 		output += '<br /><button name="send" value="/blackjack hit">Hit</button> <button name="send" value="/blackjack stand">Stand</button>';
 
 		this.players[this.curUser].user.sendTo(this.room.id, "|c|~Blackjack|" + this.players[this.curUser].user.name + ", it's your turn to move.");
-		this.players[this.curUser].user.sendTo(this.room.id, '|uhtmlchange|user-bj-' + this.id + '|');
 		this.players[this.curUser].user.sendTo(this.room.id, output);
 		this.timer = setTimeout(() => {
 			clearTimeout(this.timer);

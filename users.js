@@ -359,6 +359,7 @@ class User {
 			if (room.isMuted(this)) {
 				return '!' + this.name;
 			}
+			if (this.hideauth) return this.hideauth + this.name;
 			if (this.group !== ' ' && room && room.auth && !this.hideauth) {
 				if (Config.groupsranking.indexOf(this.group) > Config.groupsranking.indexOf(room.getAuth(this))) return this.group + this.name;
 			}

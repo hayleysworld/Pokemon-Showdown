@@ -638,6 +638,10 @@ exports.commands = {
 					});
 				});
 			});
+
+			let league = Wisp.getLeague(userid);
+			let leagueRank = Wisp.getLeagueRank(userid);
+
 			let self = this;
 			function showProfile(bucks, regdate, lastOnline, title) {
 				lastOnline = (lastOnline ? moment(lastOnline).format("MMMM Do YYYY, h:mm:ss A") + ' EST. (' + moment(lastOnline).fromNow() + ')' : "Never");
@@ -647,7 +651,7 @@ exports.commands = {
 				profile += '&nbsp;<font color=#b30000><b>Name: </font>' + Wisp.nameColor(userid, true) + (title === "" ? "" : " (" + title + ")") + flag + '<br />';
 				profile += '&nbsp;<font color=#b30000><b>Registered: </font></b>' + regdate + '<br />';
 				profile += '&nbsp;<font color=#b30000><b>Rank: </font></b>' + userGroup + (Users.vips[userid] ? ' (<font color=#6390F0><b>VIP User</b></font>)' : '') + '<br />';
-				if (Wisp.getLeague(userid)) profile += '&nbsp;<font color=#b30000><b>League: </font></b>' + Wisp.getLeague(userid) + '<br />';
+				if (league) profile += '&nbsp;<font color=#b30000><b>League: </font></b>' + league + (leagueRank ? ' (' + leagueRank + ')' : '') + '<br />';
 				if (bucks) profile += '&nbsp;<font color=#b30000><b>Bucks: </font></b>' + bucks + '<br />';
 				if (friendCode) profile += '&nbsp;<font color=#b30000><b>Friendcode: </font></b>' + friendCode + '<br />';
 				profile += '&nbsp;<font color=#b30000><b>Last ' + (targetUser && targetUser.connected ? 'Active' : 'Online') + ': </font></b> ' + lastOnline;

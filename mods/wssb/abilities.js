@@ -3374,7 +3374,7 @@ exports.BattleAbilities = {
 	//Custom abilities for wssb
 	//admins + jd
 	//jd
-	"imnotstaff": {
+	/*"imnotstaff": {
 		isNonstandard: true,
 		onStart: function (target) {
 			this.useMove('stealthrock', target);
@@ -3385,7 +3385,7 @@ exports.BattleAbilities = {
 		},
 		id: "imnotstaff",
 		name: 'I\'m Not Staff',
-	},
+	},*/
 	//Kanabae
 	"guardskillharmonics": {
 		isNonstandard: true,

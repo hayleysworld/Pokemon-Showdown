@@ -1,8 +1,3 @@
-jd - Unown - Choice Specs
-- Ability: I'm not staff - Dies on entry to battle, sets 3 layers of spikes and rocks
-- Move: I'm not supposed to be here - special explosion
-- Movepool:  Hidden Power
-
 ~Kanabae - Mega-Mawile - Leftovers
 - Ability: Guard Skill: Harmonics: Illusion, Protean, Unaware, Huge Power
 - Move: Guard Skill: Hand Sonic - Physical 100 BP 100% Accurate Fairy type move that deals damage based on Special Defense(opposite of psyshock) with 30% chance to flinch and raises speed by 2
@@ -18,7 +13,7 @@ jd - Unown - Choice Specs
 - Move: Shadow Drain - 60BP Dark type special draining move. Power is doubled if target is asleep. PP: 15 / Accuracy: 100% / Priority: 0
 - Movepool: Nasty Plot, Shadow Ball, Dream Eater
 
-@1390ufd - Pikachu-Cosplay - Light Ball
+@13490ufd - Pikachu-Cosplay - Light Ball
 - Ability: pika power- Lowers opponents Atk/SpA 6, raises every stat +2 on switch in (except evasion)
 - Move: Nuzzle, Knock off, Thunderbolt
 - Movepool: Don't touch me kings shield and raise stats expect evasion

@@ -9,12 +9,12 @@ exports.BattleScripts = {
 		// Hardcoded sets of the available Pokemon.
 		let sets = {
 			// Admins.
-			' jd': {
+			/*' jd': {
 				species: 'Unown', ability: 'I\'m Not Staff', item: 'Choice Specs', gender: '',
 				moves: ['Hidden Power'],
 				baseSignatureMove: 'imnotsupposedtobehere', signatureMove: "I'm not supposed to be here",
 				evs: {hp:4, spa:252, spe:252}, nature: 'Modest',
-			},
+			},*/
 			'~Kanabae': {
 				species: 'Mawile-Mega', ability: 'Guard Skill: Harmonics', item: 'Leftovers', gender: 'F',
 				moves: ['meteormash', 'suckerpunch', 'earthquake'],

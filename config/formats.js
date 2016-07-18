@@ -1027,9 +1027,9 @@ exports.Formats = [
 			// Edgy switch-in sentences go here.
 			// Sentences vary in style and how they are presented, so each Pokémon has its own way of sending them.
 			// Admins + jd
-			if (name === 'jd') {
+			/*if (name === 'jd') {
 				this.add('c|jd|I\'m Not staff');
-			}
+			}*/
 			if (name === 'kanabae') {
 				this.add('raw|<div class="chat"><small>~</small><button name="parseCommand" value="/user Kanabae" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#E531CA">Kanabae: </font></b>Guard Skill: Overdrive</button><em class="mine"><img src="http://kingyugi.fr/forums/img/avatars/165996.jpg" title="feelskana" height="30" width="30" /></em></div>');
 			}
@@ -1176,9 +1176,9 @@ exports.Formats = [
 		onFaint: function (pokemon) {
 			let name = toId(pokemon.name);
 			// Admins + jd
-			if (name === 'jd') {
+			/*if (name === 'jd') {
 				this.add('c|jd|Nice meme');
-			}
+			}*/
 			if (name === 'tailz') {
 				this.add('c|~Tailz|cmon dude...');
 			}
@@ -1284,9 +1284,9 @@ exports.Formats = [
 			// Switch Out Messages
 			let name = toId(pokemon.name);
 			// Admins + jd
-			if (name === 'jd') {
+			/*if (name === 'jd') {
 				this.add('c|jd|cmon...');
-			}
+			}*/
 			if (name === 'kanabae') {
 				this.add('c|~Kanabae|Let me believe what you\'ve always believed');
 			}

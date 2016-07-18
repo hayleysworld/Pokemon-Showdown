@@ -16384,7 +16384,7 @@ exports.BattleMovedex = {
 	//custom moves for wssb
 	//admins + jd
 	//jd
-	"imnotsupposedtobehere": {
+	/*"imnotsupposedtobehere": {
 		accuracy: true,
 		basePower: 0,
 		category: "Special",
@@ -16406,7 +16406,7 @@ exports.BattleMovedex = {
 		secondary: false,
 		target: "self",
 		type: "Normal",
-	},
+	},*/
 	//Kanabae
 	"guardskillhandsonic": {
 		isNonstandard: true,

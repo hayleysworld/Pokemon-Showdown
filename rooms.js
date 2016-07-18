@@ -261,9 +261,7 @@ let Room = (() => {
 			if (user.userid in this.auth) {
 				return this.auth[user.userid];
 			}
-
 			if (this.autorank) return this.autorank;
-
 			if (this.tour && this.tour.room) {
 				return this.tour.room.getAuth(user);
 			}

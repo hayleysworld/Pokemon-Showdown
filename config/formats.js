@@ -1031,7 +1031,7 @@ exports.Formats = [
 				this.add('c|jd|I\'m Not staff');
 			}*/
 			if (name === 'kanabae') {
-				this.add('raw|<div class="chat"><small>~</small><button name="parseCommand" value="/user Kanabae" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#E531CA">Kanabae: </font></b>Guard Skill: Overdrive</button><em class="mine"><img src="http://kingyugi.fr/forums/img/avatars/165996.jpg" title="feelskana" height="30" width="30" /></em></div>');
+				this.add('c|~Kanabae|/html Guard Skill: Overdrive <em class="mine"><img src="http://kingyugi.fr/forums/img/avatars/165996.jpg" title="feelskana" height="30" width="30" /></em>');
 			}
 			if (name === 'tailz') {
 				this.add('c|~Tailz|HELLO');
@@ -1060,7 +1060,7 @@ exports.Formats = [
 				this.add('c|@Rabinov|My touch will be fatal;, hope you can avoid it!');
 			}
 			if (name === 'wispbot') {
-				this.add('c|@Wisp Bot|Fear my moderation, hotter than fire feelsbn');
+				this.add('c|@Wisp Bot|/html Fear my moderation, hotter than fire <em class="mine"><img src="http://i.imgur.com/wp51rIg.png" title="feelsbn" height="30" width="30" /></em>');
 			}
 			// Drivers.
 			if (name === 'alankh') {
@@ -1070,7 +1070,7 @@ exports.Formats = [
 				this.add('c|%Alliance Chime|I-Is it safe here?|');
 			}
 			if (name === 'chiefsokka') {
-				this.add('raw|<div class="chat"><small>%</small><button name="parseCommand" value="/user Chief Sokka" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#9B4CCF">Chief Sokka: </font></b></button>I never passed medical school<em class="mine"><img src="http://i.imgur.com/hSzqy5z.png?1" title="feelsjig" height="30" width="30" /></em></div>');
+				this.add('c|%Chief Sokka|/html I never passed medical school<em class="mine"><img src="http://i.imgur.com/hSzqy5z.png?1" title="feelsjig" height="30" width="30" /></em>');
 			}
 			if (name === 'combobreaker') {
 				this.add('c|%Combo Breaker|Time to break some combos.');
@@ -1078,7 +1078,7 @@ exports.Formats = [
 			if (name === 'emgtechpvolco') {
 				this.add('c|%Emg TechP Volco|How in the hell am i driver?');
 				this.add('c|%Emg TechP Volco|So... I got a question for you... do you think the worse person... can change? that everyone can be a good person if they just try?... heh alright... do you wanna have a bad time?');
-				this.add('raw|<div class="chat"><small>%</small><button name="parseCommand" value="/user EmgTechP Volco" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#CA4A36">EmgTechP Volco: </font></b></button>It\'s a beautiful day outside.. birds are singing... flowers are blooming... on days like these... kids like YOU... SHOULD BE BURNING IN HELL!<em class="mine"><img src="http://i.imgur.com/DPr9ifK.gif" title="feelssans" height="30" width="30" /></em></div>');
+				this.add('c|%Emg TechP Volco|/html It\'s a beautiful day outside.. birds are singing... flowers are blooming... on days like these... kids like YOU... SHOULD BE BURNING IN HELL!<em class="mine"><img src="http://i.imgur.com/DPr9ifK.gif" title="feelssans" height="30" width="30" /></em></div>');
 			}
 			if (name === 'isandman') {
 				this.add('c|%ST. Sandman|Enter Sandman');
@@ -1106,10 +1106,10 @@ exports.Formats = [
 				this.add('c|+ArkenCiel|What can you even do against me?');
 			}
 			if (name === 'crystalxman') {
-				this.add('raw|<div class="chat"><small>+</small><button name="parseCommand" value="/user Crystal Xman" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#249CCC">Crystal Xman: </font></b></button>hf but this time victory is mine. There is no way I can lose <em class="mine"><img src="https://cdn.betterttv.net/emote/562b9101a6646e202bcc5447/2x" title="rarechar" height="30" width="30" /></em></div>');
+				this.add('c|+Crystal Xman|/html hf but this time victory is mine. There is no way I can lose <em class="mine"><img src="https://cdn.betterttv.net/emote/562b9101a6646e202bcc5447/2x" title="rarechar" height="30" width="30" /></em>');
 			}
 			if (name === 'escoffier') {
-				this.add('raw|<div class="chat"><small>+</small><button name="parseCommand" value="/user Escoffier" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#C63672">Escoffier: </font></b></button>Imma steal yo gurl w/ my mad skillz<em class="mine"><img src="http://i.imgur.com/21XafLU.png" title="feelshaft" height="30" width="30" /></em></div>');
+				this.add('c|+Escoffier|/html Imma steal yo gurl w/ my mad skillz<em class="mine"><img src="http://i.imgur.com/21XafLU.png" title="feelshaft" height="30" width="30" /></em></div>');
 			}
 			if (name === 'kre8noyz') {
 				this.add('c|+Kre8noyz|Someone called my house and told my wife some things about fuckn, and I don\'t like that....');
@@ -1254,7 +1254,7 @@ exports.Formats = [
 				this.add('c|+ArkenCiel|Heh, not bad.');
 			}
 			if (name === 'crystalxman') {
-				this.add('raw|<div class="chat"><small>+</small><button name="parseCommand" value="/user Crystal Xman" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#249CCC">Crystal Xman: </font></b></button>THESE LUCKY ASS PLAYERS AND THEIR HAX<em class="mine"><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /></em></div>');
+				this.add('c|+Crystal Xman|/html THESE LUCKY ASS PLAYERS AND THEIR HAX<em class="mine"><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /><img src="http://img06.deviantart.net/b308/i/2015/136/c/c/pjsalt_by_meowwwwwww-d8tnfun.png" title="PJSalt" height="30" width="30" /></em>');
 			}
 			if (name === 'escoffier') {
 				this.add('c|+Escoffier|#MakeMonoGr8Again #Trump2016 #BuildThatWall');
@@ -1266,7 +1266,7 @@ exports.Formats = [
 				this.add('c|+Midnight Prof Exo|H-How could you do this to your Senpai ;~;');
 			}*/
 			if (name === 'pegasusjane') {
-				this.add('raw|<div class="chat"><small>+</small><button name="parseCommand" value="/user Pegasus Jane" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#D83579">Pegasus Jane: </font></b></button>Wow, you\'re rude.<em class="mine"><img src="http://i.imgur.com/RIOKSJ3.gif" title="feelsspl" height="30" width="30" /></em></div>');
+				this.add('c|+Pegasus Jane|/html Wow, you\'re rude.<em class="mine"><img src="http://i.imgur.com/RIOKSJ3.gif" title="feelsspl" height="30" width="30" /></em>');
 			}
 			if (name === 'samcrowe') {
 				this.add('c|+Sam Crowe|I cant compete with cancer');
@@ -1302,7 +1302,7 @@ exports.Formats = [
 			}
 			// Moderators
 			if (name === '13490ufd') {
-				this.add('raw|<div class="chat"><small>@</small><button name="parseCommand" value="/user 13490ufd" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#979E05">13490ufd: </font></b></button>See you soon <em class="mine"><img src="http://imgur.com/YCCDZWq.png" title="feelsarken" height="30" width="30" /></em></div>');
+				this.add('c|@13490ufd|/html See you soon <em class="mine"><img src="http://imgur.com/YCCDZWq.png" title="feelsarken" height="30" width="30" /></em>');
 			}
 			if (name === 'alphaninja') {
 				this.add('c|@Alpha Ninja|PREDONK');
@@ -1330,7 +1330,7 @@ exports.Formats = [
 				this.add('c|%Chief Sokka|I\'ll be back with the right tools!');
 			}
 			if (name === 'combobreaker') {
-				this.add('raw|<div class="chat"><small>%</small><button name="parseCommand" value="/user Combo Breaker" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#A34BB6">Combo Breaker:</font></b></button>Time to bail? I\'ll be back later.<em class="mine"><img src="http://quizup-players.imgix.net/players/256149516142337468/pictures/sqxkbnx18h/original.jpg" title="feelsgn" height="30" width="30" /></em></div>');
+				this.add('c|%Combo Breaker|/html Time to bail? I\'ll be back later.<em class="mine"><img src="http://quizup-players.imgix.net/players/256149516142337468/pictures/sqxkbnx18h/original.jpg" title="feelsgn" height="30" width="30" /></em>');
 			}
 			if (name === 'emgtechpvolco') {
 				this.add('c|%Emg TechP Volco|I\'ll return to send you the hell');
@@ -1355,7 +1355,7 @@ exports.Formats = [
 				this.add('c|+Ab Dominicarus|NO FLEX... ZONE');
 			}
 			if (name === 'allianceaegis') {
-				this.add('raw|<div class="chat"><small>+</small><button name="parseCommand" value="/user Alliance Aegis" style="background:none;border:0;padding:0 5px 0 0;font-family:Verdana,Helvetica,Arial,sans-serif;font-size:9pt;cursor:pointer"><b><font color="#4A82A5">Alliance Aegis: </font></b></button>I\'ll go easy by switching out now <em class="mine"><img src="http://i.imgur.com/V728AvL.png" title="xaa" height="30" width="30" /></em></div>');
+				this.add('c|+Alliance Aegis|/html I\'ll go easy by switching out now <em class="mine"><img src="http://i.imgur.com/V728AvL.png" title="xaa" height="30" width="30" /></em>');
 			}
 			if (name === 'arkenciel') {
 				this.add('c|+ArkenCiel|Hmm.. That could be a problem.');

@@ -72,7 +72,10 @@ class Ambush {
 			return this.end();
 		}
 		this.lastRoundSurvivors = survivors.length;
-
+		if (!this.round) {
+			this.oldModchat = this.room.modchat || false;
+			this.room.modchat = '%';
+		}
 		this.round++;
 		this.madeMove = false;
 		this.loadGuns();
@@ -190,6 +193,7 @@ class Ambush {
 		}
 		if (this.release) clearTimeout(this.release);
 		clearTimeout(this.timer);
+		this.room.modchat = this.oldModchat;
 		delete this.room.ambush;
 	}
 }
@@ -262,7 +266,7 @@ let commands = {
 			"Players 'shoot' each other by using /fire [player] once the big red '<b style = \"color: red\">FIRE!</b>' message pops up on screen." +
 			"If you have shot someone in a round, then you are given a 'shield' for the rest of the round, and will be immune to any bullets till the next round starts," +
 			"but they cannot fire anymore for that round. This means that players have to strive to be the fastest shooter so that they are guaranteed safety." +
-			"Once signups end and the game begins, there is NO talking in order to not break other players' concentration." +
+			"Once signups end and the game begins, modchat % is enabled to prevent breaking other players' concentration." +
 			"Spamming /fire before the message to fire pops up will get you disqualified automatically after three attempts.<br>" +
 			"If you'd like to view the commands for Ambush, simply use /ambush help. Have fun playing!"
 		);

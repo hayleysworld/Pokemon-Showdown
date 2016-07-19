@@ -299,6 +299,11 @@ exports.commands = {
 			res.on('data', chunk => {
 				data += chunk;
 			}).on('end', () => {
+				if (data.charAt(0) !== '{') {
+					this.sendReplyBox("Error retrieving definition for <b>" + Tools.escapeHTML(target) + "</b>.");
+					room.update();
+					return;
+				}
 				data = JSON.parse(data);
 				let output = '<font color=#24678d><b>Definitions for ' + target + ':</b></font><br />';
 				if (!data[0]) {
@@ -337,6 +342,11 @@ exports.commands = {
 			res.on('data', chunk => {
 				data += chunk;
 			}).on('end', () => {
+				if (data.charAt(0) !== '{') {
+					this.sendReplyBox("Error retrieving definition for <b>" + Tools.escapeHTML(target) + "</b>.");
+					room.update();
+					return;
+				}
 				data = JSON.parse(data);
 				let definitions = data['list'];
 				if (data['result_type'] === 'no_results') {
@@ -1145,6 +1155,7 @@ Object.assign(Wisp, {
 			res.on('data', function (chunk) {
 				data += chunk;
 			}).on('end', function () {
+				if (data.charAt(0) !== '{') data = JSON.stringify({registertime: 0});
 				data = JSON.parse(data);
 				let date = data['registertime'];
 				if (date !== 0 && date.toString().length < 13) {

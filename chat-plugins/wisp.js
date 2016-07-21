@@ -299,7 +299,7 @@ exports.commands = {
 			res.on('data', chunk => {
 				data += chunk;
 			}).on('end', () => {
-				if (data.charAt(0) !== '{') {
+				if (data.charAt(0) !== '[') {
 					this.sendReplyBox("Error retrieving definition for <b>" + Tools.escapeHTML(target) + "</b>.");
 					room.update();
 					return;

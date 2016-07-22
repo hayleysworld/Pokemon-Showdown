@@ -835,15 +835,7 @@ class Tournament {
 					if (data2['bracketData']['rootNode']['children'][1]['team'] !== winner) runnerUp = data2['bracketData']['rootNode']['children'][1]['team'];
 				}
 			}
-			if (this.prizeMoney !== 0) {
-				this.room.add('|raw|<b>' + Wisp.nameColor(winner, false) + ' has won the bucks tournament for <font color=#24678d>' + this.prizeMoney + '</font> bucks!');
-				Economy.writeMoney(toId(winner), Number(this.prizeMoney), function () {
-					Economy.readMoney(toId(winner), function (amount) {
-						Economy.logTransaction(toId(winner) + " has won " + amount + (amount === 1 ? " buck " : " bucks ") + "from a bucks tournament in " + this.room.id +
-						". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
-					});
-				});
-			}
+
 			let firstMoney = false;
 			let secondMoney = false;
 			let firstBuck;
@@ -854,6 +846,11 @@ class Tournament {
 				secondMoney = Math.round(firstMoney / 2);
 				firstBuck = 'buck';
 				secondBuck = 'buck';
+			}
+
+			if (this.prizeMoney) {
+				firstMoney = this.prizeMoney[0];
+				if (this.prizeMoney[1]) secondMoney = this.prizeMoney[1];
 			}
 
 			/*if (toId(this.generator.name).substr(5) === 'buyin') {
@@ -868,7 +865,7 @@ class Tournament {
 				if (firstMoney > 1) firstBuck = 'bucks';
 				if (secondMoney > 1) secondBuck = 'bucks';
 				this.room.add('|raw|<b><font color="' + Wisp.hashColor(winner) + '">' + Tools.escapeHTML(winner) + '</font> has also won <font color=#b30000>' + firstMoney + '</font> ' + firstBuck + ' for winning the tournament!</b>');
-				if (runnerUp) this.room.add('|raw|<b><font color="' + Wisp.hashColor(runnerUp) + '">' + Tools.escapeHTML(runnerUp) + '</font> has also won <font color=#b30000>' + secondMoney + '</font> ' + secondBuck + ' for coming in second!</b>');
+				if (runnerUp && secondMoney) this.room.add('|raw|<b><font color="' + Wisp.hashColor(runnerUp) + '">' + Tools.escapeHTML(runnerUp) + '</font> has also won <font color=#b30000>' + secondMoney + '</font> ' + secondBuck + ' for coming in second!</b>');
 				Economy.writeMoney(toId(winner), firstMoney, () => {
 					Economy.readMoney(toId(winner), newMoney => {
 						Economy.logTransaction(winner + ' has won ' + firstMoney + ' ' + firstBuck + ' from a tournament in ' + this.room.title + '. They now have ' + newMoney);
@@ -1179,15 +1176,22 @@ let commands = {
 				return this.sendReply("Usage: " + cmd + " <allow|disallow>");
 			}
 		},
+		prize: 'prizemoney',
 		setprize: 'prizemoney',
 		prizemoney: function (tournament, user, params, cmd) {
-			if (!this.can('pban')) return false;
-			if (!params[0]) return this.sendReply("Usage: " + cmd + " [bucks prize]");
-			let prize = params[0];
-			if (isNaN(prize) || ~prize.indexOf('.') || prize < 1 || prize > 500) return this.errorReply("This amount is not a valid integer that is between 1 and 500.");
-			tournament.prizeMoney = prize;
-			this.privateModCommand("(" + user.name + " has set the prize for this tournament to be " + prize + " bucks.)");
-			Economy.logTransaction(user.name + " has set the prize for the tournament in " + this.room.id + " to be " + prize + (prize === 1 ? " buck." : " bucks."));
+			if (!this.can('bucks')) return false;
+			if (!params[0]) return this.sendReply("Usage: " + cmd + " [bucks prize], [optional second place prize]");
+			params[0] = params[0];
+			if (isNaN(Number(params[0])) || ~params[0].indexOf('.') || params[0] < 1 || params[0] > 500) return this.errorReply("'" + params[0] + "' is not a valid integer that is between 1 and 500.");
+			tournament.prizeMoney = [];
+			tournament.prizeMoney.push(Number(params[0]));
+			if (params[1]) {
+				params[1] = params[1];
+				if (isNaN(Number(params[1])) || ~params[1].indexOf('.') || params[1] < 1 || params[1] > 500) return this.errorReply("'" + params[1] + "' is not a valid integer that is between 1 and 500.");
+				tournament.prizeMoney.push(Number(params[1]));
+			}
+			this.privateModCommand("(" + user.name + " has set the prize for this tournament to be " + tournament.prizeMoney.join(', ') + " bucks.)");
+			Economy.logTransaction(user.name + " has set the prize for the tournament in " + this.room.id + " to be " + tournament.prizeMoney.join(', ') + " bucks.");
 		},
 	},
 };

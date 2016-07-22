@@ -1020,6 +1020,14 @@ exports.commands = {
 	},
 	wssbhelp: ["/Wssb [staff member's name] - displays data for a staffmon's movepool, custom move, and custom ability."],
 
+	roombanlist: function (target, room, user) {
+		if (!this.can('roomban', null, room)) return false;
+		if (!this.runBroadcast()) return;
+		if (Object.keys(room.bannedUsers).length < 1) return this.sendReplyBox("This room has no banned users.");
+		let users = [];
+		for (let u in room.bannedUsers) users.push(Wisp.nameColor(u, true));
+		this.sendReplyBox("Roombanned users in " + Tools.escapeHTML(room.title) + ":<br />" + users.join(', '));
+	},
 };
 
 Object.assign(Wisp, {

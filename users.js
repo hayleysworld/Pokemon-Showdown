@@ -997,7 +997,7 @@ class User {
 		}
 	}
 	onDisconnect(connection) {
-		Wisp.updateSeen(this.userid);
+		Wisp.updateSeen(this.name);
 		for (let i = 0; i < this.connections.length; i++) {
 			if (this.connections[i] === connection) {
 				// console.log('DISCONNECT: ' + this.userid);
@@ -1193,7 +1193,7 @@ class User {
 	leaveRoom(room, connection, force) {
 		room = Rooms(room);
 		if (room.id === 'global' && !force) {
-			Wisp.updateSeen(this.userid);
+			Wisp.updateSeen(this.name);
 			// you can't leave the global room except while disconnecting
 			return false;
 		}

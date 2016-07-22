@@ -820,6 +820,8 @@ let GlobalRoom = (() => {
 		}
 
 		Wisp.getTells(user);
+		Wisp.friendsNotify(user.userid);
+		Wisp.updateSeen(user.name);
 		return user;
 	};
 	GlobalRoom.prototype.onRename = function (user, oldid, joining) {
@@ -827,6 +829,8 @@ let GlobalRoom = (() => {
 		this.users[user.userid] = user;
 
 		Wisp.getTells(user);
+		if (oldid !== user.userid) Wisp.friendsNotify(user.userid);
+		Wisp.updateSeen(user.name);
 		return user;
 	};
 	GlobalRoom.prototype.onUpdateIdentity = function () {};
@@ -836,6 +840,7 @@ let GlobalRoom = (() => {
 		--this.userCount;
 		user.cancelChallengeTo();
 		this.cancelSearch(user);
+		Wisp.friendsNotify(user.userid, true);
 	};
 	GlobalRoom.prototype.startBattle = function (p1, p2, format, p1team, p2team, options) {
 		let newRoom;

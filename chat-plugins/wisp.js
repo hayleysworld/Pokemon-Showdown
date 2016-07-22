@@ -1137,7 +1137,7 @@ Object.assign(Wisp, {
 
 	nameColor: function (name, bold) {
 		return (bold ? "<b>" : "") + "<font color=" + this.hashColor(name) + ">" +
-		(Users(name) && Users(name).connected && Users.getExact(name) ? Tools.escapeHTML(Users.getExact(name).name) : Tools.escapeHTML(name)) +
+		(Users(name) && Users.getExact(name) ? Tools.escapeHTML(Users.getExact(name).name) : Tools.escapeHTML(name)) +
 		"</font>" + (bold ? "</b>" : "");
 	},
 
@@ -1172,17 +1172,17 @@ Object.assign(Wisp, {
 		});
 	},
 
-	updateSeen: function (userid) {
-		userid = toId(userid);
+	updateSeen: function (user) {
+		let userid = toId(user);
 		if (userid.match(/^guest[0-9]/)) return false;
 		let date = Date.now();
 		Wisp.database.all("SELECT * FROM users WHERE userid=$userid", {$userid: userid}, function (err, rows) {
 			if (rows.length < 1) {
-				Wisp.database.run("INSERT INTO users(userid, lastSeen) VALUES ($userid, $date)", {$userid: userid, $date: date}, function (err) {
+				Wisp.database.run("INSERT INTO users(userid, name, lastSeen) VALUES ($userid, $name, $date)", {$userid: userid, $name: user, $date: date}, function (err) {
 					if (err) return console.log(err);
 				});
 			} else {
-				Wisp.database.run("UPDATE users SET lastSeen=$date WHERE userid=$userid", {$date: date, $userid: userid}, function (err) {
+				Wisp.database.run("UPDATE users SET lastSeen=$date, name=$name WHERE userid=$userid", {$date: date, $name: user, $userid: userid}, function (err) {
 					if (err) return console.log(err);
 				});
 			}

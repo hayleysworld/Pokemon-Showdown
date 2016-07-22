@@ -1,7 +1,8 @@
 'use strict';
 
 Wisp.database = new sqlite3.Database('config/users.db', function () {
-	Wisp.database.run("CREATE TABLE if not exists users (userid TEXT, name TEXT, bucks INTEGER, lastSeen INTEGER, onlineTime INTEGER, credits INTEGER, title TEXT)");
+	Wisp.database.run("CREATE TABLE if not exists users (userid TEXT, name TEXT, bucks INTEGER, lastSeen INTEGER, onlineTime INTEGER, credits INTEGER, title TEXT, notifystatus INTEGER)");
+	Wisp.database.run("CREATE TABLE if not exists friends (id integer primary key, userid TEXT, friend TEXT)");
 });
 
 const fs = require('fs');

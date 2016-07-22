@@ -125,13 +125,16 @@ exports.commands = {
 		if (amount > 1000) return this.sendReply("/givebucks - You can't give more than 1000 bucks at a time.");
 		if (amount < 1) return this.sendReply("/givebucks - You can't give less than one buck.");
 
-		Economy.writeMoney(targetUser, amount);
-		if (Users(targetUser) && Users(targetUser).connected) {
-			Users.get(targetUser).popup('|html|You have received ' + amount + ' ' + (amount === 1 ? 'buck' : 'bucks') +
-			' from ' + Wisp.nameColor(user.userid, true) + '.');
-		}
-		this.sendReply(targetUser + " has received " + amount + ((amount === 1) ? " buck." : " bucks."));
-		Economy.logTransaction(user.name + " has given " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser);
+		Economy.writeMoney(targetUser, amount, () => {
+			Economy.readMoney(targetUser, newAmount => {
+				if (Users(targetUser) && Users(targetUser).connected) {
+					Users.get(targetUser).popup('|html|You have received ' + amount + ' ' + (amount === 1 ? 'buck' : 'bucks') +
+					' from ' + Wisp.nameColor(user.userid, true) + '.');
+				}
+				this.sendReply(targetUser + " has received " + amount + ((amount === 1) ? " buck." : " bucks."));
+				Economy.logTransaction(user.name + " has given " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser + ". They now have " + newAmount + (newAmount === 1 ? " buck." : " bucks."));
+			});
+		});
 	},
 
 	takemoney:'takebucks',
@@ -151,13 +154,16 @@ exports.commands = {
 		if (amount > 1000) return this.sendReply("/takebucks - You can't take more than 1000 bucks at a time.");
 		if (amount < 1) return this.sendReply("/takebucks - You can't take less than one buck.");
 
-		Economy.writeMoney(targetUser, -amount);
-		if (Users(targetUser) && Users(targetUser).connected) {
-			Users.get(targetUser).popup('|html|' + Wisp.nameColor(user.userid, true) + ' has removed ' + amount + ' ' + (amount === 1 ? 'buck' : 'bucks') +
-			' from you.<br />');
-		}
-		this.sendReply("You removed " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + Tools.escapeHTML(targetUser));
-		Economy.logTransaction(user.name + " has taken " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + targetUser);
+		Economy.writeMoney(targetUser, -amount, () => {
+			Economy.readMoney(targetUser, newAmount => {
+				if (Users(targetUser) && Users(targetUser).connected) {
+					Users.get(targetUser).popup('|html|' + Wisp.nameColor(user.userid, true) + ' has removed ' + amount + ' ' + (amount === 1 ? 'buck' : 'bucks') +
+					' from you.<br />');
+				}
+				this.sendReply("You removed " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + Tools.escapeHTML(targetUser));
+				Economy.logTransaction(user.name + " has taken " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + targetUser + ". They now have " + newAmount + (newAmount === 1 ? " buck." : " bucks."));
+			});
+		});
 	},
 
 	transferbucks: function (target, room, user) {
@@ -179,9 +185,19 @@ exports.commands = {
 			if (money < amount) return this.sendReply("/transferbucks - You can't transfer more bucks than you have.");
 			Economy.writeMoney(user.userid, -amount, () => {
 				Economy.writeMoney(targetUser, amount, () => {
-					this.sendReply("You sent " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser);
-					Economy.logTransaction(user.name + " has transfered " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser);
-					if (Users.getExact(targetUser) && Users.getExact(targetUser)) Users.getExact(targetUser).send('|popup||html|' + Wisp.nameColor(user.name, true) + " has sent you " + amount + ((amount === 1) ? " buck." : " bucks."));
+					Economy.readMoney(targetUser, firstAmount => {
+						Economy.readMoney(user.userid, secondAmount => {
+							this.sendReply("You sent " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser);
+							Economy.logTransaction(
+								user.name + " has transfered " + amount + ((amount === 1) ? " buck " : " bucks ") + " to " + targetUser + "\n" +
+								user.name + " now has " + secondAmount + " " + (secondAmount === 1 ? "buck." : "bucks.") + " " +
+								targetUser + " now has " + firstAmount + " " + (firstAmount === 1 ? "buck." : "bucks.")
+							);
+							if (Users.getExact(targetUser) && Users.getExact(targetUser)) {
+								Users.getExact(targetUser).send('|popup||html|' + Wisp.nameColor(user.name, true) + " has sent you " + amount + ((amount === 1) ? " buck." : " bucks."));
+							}
+						});
+					});
 				});
 			});
 		});
@@ -201,44 +217,56 @@ exports.commands = {
 			switch (itemid) {
 			case 'symbol':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a custom symbol.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a custom symbol for " + prices[itemid] + " bucks.");
-				user.canCustomSymbol = true;
-				this.sendReplyBox("You have purchased a custom symbol. You may now use /customsymbol [symbol] to change your symbol.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a custom symbol for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						user.canCustomSymbol = true;
+						this.sendReplyBox("You have purchased a custom symbol. You may now use /customsymbol [symbol] to change your symbol.");
+						matched = true;
+					});
+				});
 				break;
 			case 'avatar':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase an avatar.");
 				if (!targetSplit[1]) return this.sendReply("Please specify the image you would like as your avatar with /buy avatar, image url.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased an avatar for " + prices[itemid] + " bucks. Image: " + targetSplit[1]);
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an avatar.<center><img src=\"" + targetSplit[1] +
-					"\" width=\"80\" height=\"80\"></center><br /><button name=\"send\" value=\"/customavatar set, " + user.userid + ", " + targetSplit[1] + "\">Click to add</button> | " +
-					"<button name=\"send\" value=\"/customavatar delete, " + user.userid + "\">Click to remove</button>");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an avatar.").update();
-				this.sendReply("You have purchased an avatar. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased an avatar for " + prices[itemid] + " bucks. Image: " + targetSplit[1] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an avatar.<center><img src=\"" + targetSplit[1] +
+						"\" width=\"80\" height=\"80\"></center><br /><button name=\"send\" value=\"/customavatar set, " + user.userid + ", " + targetSplit[1] + "\">Click to add</button> | " +
+						"<button name=\"send\" value=\"/customavatar delete, " + user.userid + "\">Click to remove</button>");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an avatar.").update();
+						this.sendReply("You have purchased an avatar. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			case 'room':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a chat room.");
 				if (!targetSplit[1]) return this.sendReply("Please specify a name for the chat room with /buy chatroom, name.");
 				if (Rooms.rooms[toId(targetSplit[1])]) return this.sendReply("You can't purchase a room that already exists.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a chat room for " + prices[itemid] + " bucks.");
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a chat room. Name: " + Tools.escapeHTML(targetSplit[1]));
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a chat room named \"" + Tools.escapeHTML(targetSplit[1]) + "\".").update();
-				this.sendReply("You've purchased a chat room. You will be notified when it has been created.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a chat room for " + prices[itemid] + " bucks.  They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a chat room. Name: " + Tools.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a chat room named \"" + Tools.escapeHTML(targetSplit[1]) + "\".").update();
+						this.sendReply("You've purchased a chat room. You will be notified when it has been created.");
+						matched = true;
+					});
+				});
 				break;
 			case 'poof':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a poof.");
 				if (!targetSplit[1]) return this.sendReply("Please specify the poof message you would like to buy with /buy poof, poof message.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a poof message for " + prices[itemid] + " bucks.");
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1]));
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1])).update();
-				this.sendReply("You've purchased a poof message. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a poof message for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1])).update();
+						this.sendReply("You've purchased a poof message. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			case 'title':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a user title.");
@@ -247,43 +275,56 @@ exports.commands = {
 				if (targetSplit[2]) hex = targetSplit[2];
 				if (targetSplit[1].length > 25) return this.sendReply("Titles may not be longer than 25 characters.");
 				if (hex && hex.length > 7) return this.sendReply("Hex may not be longer than 7 characters.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a user title " + prices[itemid] + " bucks. Title: " + targetSplit[1] + (hex ? " Hex: " + hex : ""));
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
-					Tools.escapeHTML(targetSplit[1]) + "</b></font><br />" +
-					"<button name=\"send\" value=\"/title set, " + user.userid + ", " + targetSplit[1] + (hex ? ", " + hex : "") + "\">Click to add</button>");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
-					Tools.escapeHTML(targetSplit[1]) + "</b></font>").update();
-				this.sendReply("You have purchased a title. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a user title " + prices[itemid] + " bucks. Title: " + targetSplit[1] + (hex ? " Hex: " + hex : "") +
+						". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
+						Tools.escapeHTML(targetSplit[1]) + "</b></font><br />" +
+						"<button name=\"send\" value=\"/title set, " + user.userid + ", " + targetSplit[1] + (hex ? ", " + hex : "") + "\">Click to add</button>");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
+						Tools.escapeHTML(targetSplit[1]) + "</b></font>").update();
+						this.sendReply("You have purchased a title. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			case 'infobox':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase an infobox.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased an infobox for " + prices[itemid] + " bucks.");
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an infobox.");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an infobox.").update();
-				this.sendReply("You have purchased an infobox. Please put everything you want on it in a pastebin including the command then send it to an Administrator, if you have any questions about what you can add pm an Admin.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased an infobox for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an infobox.");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an infobox.").update();
+						this.sendReply("You have purchased an infobox. Please put everything you want on it in a pastebin including the command then send it to an Administrator, if you have any questions about what you can add pm an Admin.");
+						matched = true;
+					});
+				});
 				break;
 			case 'declare':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a declare.");
 				if (!targetSplit[1]) return this.sendReply("Please specify the declare you'd like with /buy declare, message.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a declare for " + prices[itemid] + " bucks.");
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1]));
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1])).update();
-				this.sendReply("You have purchased a declare. Please message an Administrator with the message you would like to declare.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a declare for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1])).update();
+						this.sendReply("You have purchased a declare. Please message an Administrator with the message you would like to declare.");
+						matched = true;
+					});
+				});
 				break;
 			case 'fix':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a fix.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a fix for " + prices[itemid] + " bucks.");
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a fix.");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a fix.").update();
-				this.sendReply("You have purchased a fix. Please message an Administrator with what needs fixed.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a fix for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a fix.");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a fix.").update();
+						this.sendReply("You have purchased a fix. Please message an Administrator with what needs fixed.");
+						matched = true;
+					});
+				});
 				break;
 			case 'roomshop':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a room shop.");
@@ -292,59 +333,73 @@ exports.commands = {
 				if (!targetRoom) return this.sendReply("That room doesn't exist.");
 				if (!targetRoom.chatRoomData) return this.sendReply("That room can't have a room shop.");
 				if (!targetRoom.founder) return this.sendReply("Rooms require a room founder to have a shop.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a room shop for " + prices[itemid] + " bucks. Room: " + targetRoom.title);
-				matched = true;
-				this.sendReply(targetRoom.title + " has received a shop. The room owners of that room should view /roomshop help to view the room shop commands.");
-				targetRoom.add('|raw|<div class="broadcast-green"><b>' + Tools.escapeHTML(user.name) + ' has just purchased a room shop for this room.</b></div>');
-				targetRoom.update();
-				targetRoom.shop = {};
-				targetRoom.shopList = [];
-				targetRoom.chatRoomData.shop = targetRoom.shop;
-				targetRoom.chatRoomData.shopList = targetRoom.shopList;
-				Rooms.global.writeChatRoomData();
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a room shop for " + prices[itemid] + " bucks. Room: " + targetRoom.title + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						matched = true;
+						this.sendReply(targetRoom.title + " has received a shop. The room owners of that room should view /roomshop help to view the room shop commands.");
+						targetRoom.add('|raw|<div class="broadcast-green"><b>' + Tools.escapeHTML(user.name) + ' has just purchased a room shop for this room.</b></div>');
+						targetRoom.update();
+						targetRoom.shop = {};
+						targetRoom.shopList = [];
+						targetRoom.chatRoomData.shop = targetRoom.shop;
+						targetRoom.chatRoomData.shopList = targetRoom.shopList;
+						Rooms.global.writeChatRoomData();
+					});
+				});
 				break;
 			case 'emote':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase an emote.");
 				if (!targetSplit[2]) return this.sendReply("Please specify the image you would like as your emote with /buy emote, name, image url.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased an emote for " + prices[itemid] + " bucks. Name: " + Tools.escapeHTML(targetSplit[1]) +
-					" Image: " + targetSplit[2]);
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
-					"<img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">" +
-					"<br /><button name=\"send\" value=\"/emote add, " + targetSplit[1] + ", " + targetSplit[2] + "\">Click to add</button>");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
-					" <img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">").update();
-				this.sendReply("You have purchased an emote. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased an emote for " + prices[itemid] + " bucks. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						" Image: " + targetSplit[2] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						"<img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">" +
+						"<br /><button name=\"send\" value=\"/emote add, " + targetSplit[1] + ", " + targetSplit[2] + "\">Click to add</button>");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						" <img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">").update();
+						this.sendReply("You have purchased an emote. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			case 'icon':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase an icon.");
 				if (!targetSplit[1]) return this.sendReply("Please specify the image you would like as your icon with /buy icon, image url.");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased an icon for " + prices[itemid] + " bucks. Image: " + targetSplit[1]);
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an icon. <img src=\"" + targetSplit[1] + "\" width=\"32\" height=\"32\">").update();
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an icon. <img src=\"" + targetSplit[1] + "\" width=\"32\" height=\"32\">" +
-					"<br /><button name=\"send\" value=\"/icon " + user.name + ", " + targetSplit[1] + "\">Click to add</button>");
-				this.sendReply("You have purchased an icon. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased an icon for " + prices[itemid] + " bucks. Image: " + targetSplit[1] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an icon. <img src=\"" + targetSplit[1] + "\" width=\"32\" height=\"32\">").update();
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an icon. <img src=\"" + targetSplit[1] + "\" width=\"32\" height=\"32\">" +
+						"<br /><button name=\"send\" value=\"/icon " + user.name + ", " + targetSplit[1] + "\">Click to add</button>");
+						this.sendReply("You have purchased an icon. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			case 'color':
 				if (userMoney < prices[itemid]) return this.sendReply("You need " + (prices[itemid] - userMoney) + " more bucks to purchase a custom color.");
 				if (!targetSplit[1]) return this.sendReply("|raw|Please specify the color you would like with /buy color, hexcode. (see: <a href=http://www.colorpicker.com/>http://www.colorpicker.com/</a>)");
-				Economy.writeMoney(user.userid, prices[itemid] * -1);
-				Economy.logTransaction(user.name + " has purchased a custom color for " + prices[itemid] + " bucks. Image: " + targetSplit[1]);
-				Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
-					"\">" + Tools.escapeHTML(user.name) + "</font>" +
-					"<br /><button name=\"send\" value=\"/customcolor " + user.name + ", " + targetSplit[1] + "\">Click to add</button>");
-				Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
-					"\">" + Tools.escapeHTML(user.name) + "</font>").update();
-				this.sendReply("You have purchased a custom color. It will be added shortly.");
-				matched = true;
+				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
+					Economy.readMoney(user.userid, amount => {
+						Economy.logTransaction(user.name + " has purchased a custom color for " + prices[itemid] + " bucks. Image: " + targetSplit[1] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
+						"\">" + Tools.escapeHTML(user.name) + "</font>" +
+						"<br /><button name=\"send\" value=\"/customcolor " + user.name + ", " + targetSplit[1] + "\">Click to add</button>");
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
+						"\">" + Tools.escapeHTML(user.name) + "</font>").update();
+						this.sendReply("You have purchased a custom color. It will be added shortly.");
+						matched = true;
+					});
+				});
 				break;
 			}
 
-			if (matched) return this.sendReply("You now have " + (userMoney - prices[itemid]) + " bucks left.");
+			if (matched) {
+				return this.sendReply("You now have " + (userMoney - prices[itemid]) + " bucks left.");
+			}
 		});
 	},
 

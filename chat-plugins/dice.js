@@ -100,7 +100,13 @@ class Dice {
 					).update();
 					Economy.writeMoney(winner.userid, (this.bet - taxedAmt), () => {
 						Economy.writeMoney(loser.userid, -this.bet, () => {
-							this.end();
+							Economy.readMoney(winner.userid, winnerMoney => {
+								Economy.readMoney(loser.userid, loserMoney => {
+									Economy.logTransaction(winner.userid + " has won a dice against " + loser.userid + ". They now have " + winnerMoney + (winnerMoney === 1 ? " buck." : " bucks."));
+									Economy.logTransaction(loser.userid + " has lost a dice against " + winner.userid + ". T hey now have " + loserMoney + (loserMoney === 1 ? " buck." : " bucks."));
+									this.end();
+								});
+							});
 						});
 					});
 				}, 800);

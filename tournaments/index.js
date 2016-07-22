@@ -837,7 +837,12 @@ class Tournament {
 			}
 			if (this.prizeMoney !== 0) {
 				this.room.add('|raw|<b>' + Wisp.nameColor(winner, false) + ' has won the bucks tournament for <font color=#24678d>' + this.prizeMoney + '</font> bucks!');
-				Economy.writeMoney(toId(winner), Number(this.prizeMoney));
+				Economy.writeMoney(toId(winner), Number(this.prizeMoney), function () {
+					Economy.readMoney(toId(winner), function (amount) {
+						Economy.logTransaction(toId(winner) + " has won " + amount + (amount === 1 ? " buck " : " bucks ") + "from a bucks tournament in " + this.room.id +
+						". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
+					});
+				});
 			}
 			let firstMoney = false;
 			let secondMoney = false;
@@ -1182,6 +1187,7 @@ let commands = {
 			if (isNaN(prize) || ~prize.indexOf('.') || prize < 1 || prize > 500) return this.errorReply("This amount is not a valid integer that is between 1 and 500.");
 			tournament.prizeMoney = prize;
 			this.privateModCommand("(" + user.name + " has set the prize for this tournament to be " + prize + " bucks.)");
+			Economy.logTransaction(user.name + " has set the prize for the tournament in " + this.room.id + " to be " + prize + (prize === 1 ? " buck." : " bucks."));
 		},
 	},
 };

@@ -1651,8 +1651,8 @@ exports.commands = {
 		if (!target) return this.parse('/help htmlbox');
 		target = this.canHTML(target);
 		if (!target) return;
-		if (!this.can('declare', null, room)) return;
 		if (!this.runBroadcast('!htmlbox')) return;
+		if (this.broadcasting) if (!this.can('declare', null, room)) return;
 
 		this.sendReplyBox(target);
 	},

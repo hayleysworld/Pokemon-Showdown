@@ -1731,7 +1731,7 @@ Rooms.RoomGamePlayer = require('./room-game.js').RoomGamePlayer;
 setTimeout(function () {
 	for (let room in Rooms.rooms) {
 		let curRoom = Rooms.rooms[room];
-		if (!curRoom.protect && !curRoom.isOfficial && !curRoom.isPrivate && !curRoom.isPersonal && !curRoom.isStaff && curRoom.messageCount < 100) {
+		if (curRoom.type === 'chat' && !curRoom.protect && !curRoom.isOfficial && !curRoom.isPrivate && !curRoom.isPersonal && !curRoom.isStaff && curRoom.messageCount < 100) {
 			Rooms.global.deregisterChatRoom(curRoom.id);
 			curRoom.addRaw('<font color=red><b>This room has been automatically deleted due to inactivity.  It will be removed upon the next server restart.</b></font>');
 			if (curRoom.id !== 'global') curRoom.update();

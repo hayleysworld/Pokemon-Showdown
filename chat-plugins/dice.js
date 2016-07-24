@@ -159,9 +159,9 @@ exports.commands = {
 	diceend: 'enddice',
 	enddice: function (target, room, user) {
 		if (room.id === 'lobby') return this.errorReply("This command cannot be used in the Lobby.");
-		if (!this.can('broadcast', null, room)) return this.errorReply("You must be ranked + or higher in this room to end a game of dice.");
 		if ((user.locked || room.isMuted(user)) && !user.can('bypassall')) return this.sendReply("You cannot use this command while unable to talk.");
 		if (!room.dice) return this.errorReply('There is no game of dice going on in this room.');
+		if (!user.can('broadcast', null, room) && !room.dice.players.includes(user)) return this.errorReply("You must be ranked + or higher in this room to end a game of dice.");
 
 		room.dice.end(user);
 	},
